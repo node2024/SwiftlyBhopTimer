@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>SwiftlyBhopTimer</AssemblyName>
+    <RootNamespace>SwiftlyBhopTimer</RootNamespace>
+    <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <OutputPath>$(MSBuildProjectDirectory)\build\SwiftlyBhopTimer\</OutputPath>
+    <OutputPath Condition="'$(RuntimeIdentifier)' == 'linux-x64'">$(MSBuildProjectDirectory)\build\SwiftlyBhopTimer_linux\</OutputPath>
+    <OutputPath Condition="'$(RuntimeIdentifier)' == 'win-x64'">$(MSBuildProjectDirectory)\build\SwiftlyBhopTimer_windows\</OutputPath>
+    <PublishDir>$(MSBuildProjectDirectory)\build\publish\</PublishDir>
+    <PublishDir Condition="'$(RuntimeIdentifier)' == 'linux-x64'">$(MSBuildProjectDirectory)\build\SwiftlyBhopTimer_linux\</PublishDir>
+    <PublishDir Condition="'$(RuntimeIdentifier)' == 'win-x64'">$(MSBuildProjectDirectory)\build\SwiftlyBhopTimer_windows\</PublishDir>
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SwiftlyS2.CS2" Version="1.3.5" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="resources\SwiftlyBhopTimer\MapData\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="resources\SwiftlyBhopTimer\MapChooser\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <EmbeddedResource Include="resources\SwiftlyBhopTimer\MapData\**\*">
+      <LogicalName>SwiftlyBhopTimer/MapData/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="resources\SwiftlyBhopTimer\MapChooser\**\*">
+      <LogicalName>SwiftlyBhopTimer/MapChooser/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>
