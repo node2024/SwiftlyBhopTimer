@@ -3,9 +3,17 @@
 > [!IMPORTANT]
 > This project was created through Vibe Coding. You are free to fork each project and copy, customize, or develop it however you like.
 
+> [!NOTE]
+> This English README is machine-translated. The Japanese README is the primary version.
+
 SwiftlyS2 bhop-focused timer workspace.
 
 - [日本語 README](README.ja.md)
+
+## Related Repositories
+
+- [SwiftlyBhopTimer](https://github.com/node2024/SwiftlyBhopTimer)
+- [SwiftlyBhopTimer MetaMod Helper](https://github.com/node2024/SwiftlyBhopTimerMetaModHelper)
 
 This project is intentionally separated from the legacy CounterStrikeSharp
 project. It does not reference `CounterStrikeSharp.API` and targets SwiftlyS2's

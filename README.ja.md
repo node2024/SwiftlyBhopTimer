@@ -8,6 +8,11 @@ SwiftlyS2 向けの bhop 特化タイマープラグインです。
 - [English README](README.md)
 - [コマンド表](COMMANDS.ja.md)
 
+## 関連リポジトリ
+
+- [SwiftlyBhopTimer](https://github.com/node2024/SwiftlyBhopTimer)
+- [SwiftlyBhopTimer MetaMod Helper](https://github.com/node2024/SwiftlyBhopTimerMetaModHelper)
+
 このプロジェクトは、従来の CounterStrikeSharp 版とは分離されています。
 `CounterStrikeSharp.API` は参照せず、SwiftlyS2 の C# API を対象にしています。
 
