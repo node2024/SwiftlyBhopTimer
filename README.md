@@ -1,5 +1,8 @@
 # SwiftlyBhopTimer
 
+> [!IMPORTANT]
+> This project was created through Vibe Coding. You are free to fork each project and copy, customize, or develop it however you like.
+
 SwiftlyS2 bhop-focused timer workspace.
 
 - [日本語 README](README.ja.md)

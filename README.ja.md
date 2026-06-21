@@ -1,5 +1,8 @@
 # SwiftlyBhopTimer
 
+> [!IMPORTANT]
+> このプロジェクトは Vibe Coding で作成されています。各プロジェクトは自由にフォークし、コピー、カスタマイズ、開発していただいて構いません。
+
 SwiftlyS2 向けの bhop 特化タイマープラグインです。
 
 - [English README](README.md)
