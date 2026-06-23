@@ -111,6 +111,8 @@ public sealed partial class SwiftlyBhopTimer
         state.WasInsideEndZone = false;
         state.CurrentMapStage = 0;
         state.CurrentStageTicks = null;
+        state.CurrentMapCheckpoint = 0;
+        state.CurrentCheckpointTicks = null;
         state.PauseFreezePosition = null;
         ResetBonusTimerState(state, clearLastFinished: true);
     }

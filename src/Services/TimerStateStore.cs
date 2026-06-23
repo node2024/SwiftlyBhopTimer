@@ -83,6 +83,8 @@ public sealed class PlayerTimerState
     public int HudTicks { get; set; }
     public int CurrentMapStage { get; set; }
     public int? CurrentStageTicks { get; set; }
+    public int CurrentMapCheckpoint { get; set; }
+    public int? CurrentCheckpointTicks { get; set; }
     public int StartSpeedLimitPauseTicks { get; set; }
     public int RestartCommandCooldownTicks { get; set; }
     public int PendingRestartTeleportTicks { get; set; }

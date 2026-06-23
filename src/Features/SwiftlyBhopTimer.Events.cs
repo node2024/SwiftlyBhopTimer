@@ -487,24 +487,44 @@ public sealed partial class SwiftlyBhopTimer
         }
 
         var state = _timerStateStore.GetOrCreate(player.Slot, player.SteamID.ToString(), player.Name);
-        if (state.IsTimerBlocked || state.IsNoclipEnabled)
+        if (state.IsNoclipEnabled)
         {
             return;
         }
 
-        if (state.IsTimerPaused)
+        if (IsTimerStopTrigger(triggerName))
+        {
+            HandleTimerStopTrigger(player, state);
+            return;
+        }
+
+        if (IsTimerResetTrigger(triggerName))
+        {
+            HandleTimerResetTrigger(player, state);
+            return;
+        }
+
+        if (state.IsTimerBlocked || state.IsTimerPaused)
         {
             return;
         }
 
-        if (_activeMap.IsStartTrigger(triggerName) && IsAnyTimerRunning(state))
+        var pawn = player.PlayerPawn ?? player.Pawn;
+        var isStartTrigger = _activeMap.IsStartTrigger(triggerName);
+        var isBonusStartTrigger = TryParseBonusStartTrigger(triggerName, out var startBonusNumber);
+        if (isStartTrigger || isBonusStartTrigger)
+        {
+            LimitStartZoneSpeed(player, pawn, state);
+        }
+
+        if (isStartTrigger && IsAnyTimerRunning(state))
         {
             _replayService?.DiscardRecording(player);
             ResetTimerStateWithStopSound(player, state);
             SendChat(player, $"{gray("Timer")} reset.");
         }
 
-        if (TryParseBonusStartTrigger(triggerName, out var startBonusNumber) && IsAnyTimerRunning(state))
+        if (isBonusStartTrigger && IsAnyTimerRunning(state))
         {
             _replayService?.DiscardRecording(player);
             ResetTimerStateWithStopSound(player, state);
@@ -525,6 +545,7 @@ public sealed partial class SwiftlyBhopTimer
         }
 
         TryNotifyStage(player, state, triggerName);
+        TryNotifyCheckpoint(player, state, triggerName);
 
         if (state.DebugTouches)
         {
@@ -552,12 +573,20 @@ public sealed partial class SwiftlyBhopTimer
             return;
         }
 
-        if (_activeMap.IsStartTrigger(triggerName) && !IsAnyTimerRunning(state))
+        var pawn = player.PlayerPawn ?? player.Pawn;
+        var isStartTrigger = _activeMap.IsStartTrigger(triggerName);
+        var isBonusStartTrigger = TryParseBonusStartTrigger(triggerName, out var bonusNumber);
+        if (isStartTrigger || isBonusStartTrigger)
+        {
+            LimitStartZoneSpeed(player, pawn, state);
+        }
+
+        if (isStartTrigger && !IsAnyTimerRunning(state))
         {
             StartTimer(player, state);
         }
 
-        if (TryParseBonusStartTrigger(triggerName, out var bonusNumber) && !IsAnyTimerRunning(state))
+        if (isBonusStartTrigger && !IsAnyTimerRunning(state))
         {
             StartBonusTimer(player, state, bonusNumber);
         }
@@ -595,7 +624,7 @@ public sealed partial class SwiftlyBhopTimer
             return false;
         }
 
-        player = EntityReflection.GetPlayerFromPawn(Core.PlayerManager, playerEntity)!;
+        player = ResolveTouchedPlayer(playerEntity)!;
         if (!IsPlayablePlayer(player))
         {
             return false;
@@ -603,6 +632,45 @@ public sealed partial class SwiftlyBhopTimer
 
         triggerName = EntityReflection.GetEntityName(triggerEntity);
         return !string.IsNullOrWhiteSpace(triggerName);
+    }
+
+    private IPlayer? ResolveTouchedPlayer(object playerEntity)
+    {
+        if (EntityReflection.TryGetEntityIndex(playerEntity, out var entityIndex))
+        {
+            foreach (var candidate in Core.PlayerManager.GetAllValidPlayers())
+            {
+                if (IsPlayablePlayer(candidate) && PlayerMatchesEntity(candidate, playerEntity, entityIndex))
+                {
+                    return candidate;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static bool PlayerMatchesEntity(IPlayer player, object playerEntity, int entityIndex)
+    {
+        foreach (var candidate in new object?[] { player.PlayerPawn, player.Pawn, player.Controller, player.ServerSideClient, player })
+        {
+            if (candidate is null)
+            {
+                continue;
+            }
+
+            if (ReferenceEquals(candidate, playerEntity))
+            {
+                return true;
+            }
+
+            if (EntityReflection.TryGetEntityIndex(candidate, out var candidateIndex) && candidateIndex == entityIndex)
+            {
+                return true;
+            }
+        }
+
+        return player.Slot + 1 == entityIndex;
     }
 
     private bool TryParseBonusStartTrigger(string triggerName, out int bonusNumber)

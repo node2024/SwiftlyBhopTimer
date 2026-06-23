@@ -79,8 +79,10 @@ public sealed partial class SwiftlyBhopTimer
         state.IsTimerPaused = false;
         state.TimerTicks = 0;
         state.LastFinishedTicks = null;
-        state.CurrentMapStage = 1;
+state.CurrentMapStage = 1;
         state.CurrentStageTicks = 0;
+        state.CurrentMapCheckpoint = 0;
+        state.CurrentCheckpointTicks = null;
         _replayService?.StartRecording(player);
         _timerSoundService?.PlayStart(player, state.SoundsEnabled);
         SendChat(player, $"{green("Timer started")} {label("|")} {gold(TimerRunModes.ToDisplayName(state.TimerMode))} {label("|")} {label("Stage")} {gold("#1")}");
@@ -146,8 +148,10 @@ public sealed partial class SwiftlyBhopTimer
         state.CurrentBonusNumber = bonusNumber;
         state.BonusTimerTicks = 0;
         state.LastFinishedBonusTicks = null;
-        state.CurrentMapStage = 0;
+state.CurrentMapStage = 0;
         state.CurrentStageTicks = null;
+        state.CurrentMapCheckpoint = 0;
+        state.CurrentCheckpointTicks = null;
         state.HudTicks = 0;
         _replayService?.StartRecording(player);
         _timerSoundService?.PlayStart(player, state.SoundsEnabled);
@@ -186,6 +190,82 @@ public sealed partial class SwiftlyBhopTimer
         state.CurrentMapStage = stage;
         state.CurrentStageTicks = stageTicks;
         SendChat(player, $"{label("Stage")} {gold($"#{stage}")} {label("|")} {lightBlue(TimeFormatter.FormatTicks(stageTicks))}");
+    }
+
+    private void TryNotifyCheckpoint(IPlayer player, PlayerTimerState state, string triggerName)
+    {
+        if (!state.IsTimerRunning || state.IsTimerPaused || !TryParseCheckpointTrigger(triggerName, out var checkpoint))
+        {
+            return;
+        }
+
+        if (state.CurrentMapCheckpoint == checkpoint)
+        {
+            return;
+        }
+
+        var checkpointTicks = state.TimerTicks;
+        state.CurrentMapCheckpoint = checkpoint;
+        state.CurrentCheckpointTicks = checkpointTicks;
+        SendChat(player, $"{label("Checkpoint")} {gold($"#{checkpoint}")} {label("|")} {lightBlue(TimeFormatter.FormatTicks(checkpointTicks))}");
+    }
+
+    private static bool TryParseCheckpointTrigger(string triggerName, out int checkpoint)
+    {
+        checkpoint = 0;
+        if (string.IsNullOrWhiteSpace(triggerName))
+        {
+            return false;
+        }
+
+        var match = CheckpointTriggerPattern.Match(triggerName);
+        return match.Success &&
+               int.TryParse(match.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out checkpoint);
+    }
+
+    private void HandleTimerStopTrigger(IPlayer player, PlayerTimerState state)
+    {
+        _replayService?.DiscardRecording(player);
+        ResetTimerStateWithStopSound(player, state);
+        SendChat(player, $"{label("Timer")} {label("|")} {red("cancelled")} {gray("illegal skip attempt")}");
+    }
+
+    private void HandleTimerResetTrigger(IPlayer player, PlayerTimerState state)
+    {
+        var restartingBonusNumber = state.IsBonusTimerRunning && state.CurrentBonusNumber is >= 1 and <= 99
+            ? state.CurrentBonusNumber
+            : 0;
+
+        if (restartingBonusNumber > 0 && GetBonusRestartPosition(restartingBonusNumber) is { } bonusDestination)
+        {
+            QueueRestartRespawn(player, state, bonusDestination, applyCommandCooldown: false);
+        }
+        else if (GetConfiguredRestartPosition() is { } configuredDestination)
+        {
+            QueueRestartRespawn(player, state, configuredDestination, applyCommandCooldown: false);
+        }
+        else
+        {
+            QueueRestartRespawnToMapStart(player, state, GetStartZoneRestartFallbackPosition(), applyCommandCooldown: false);
+        }
+
+        SendChat(player, $"{label("Reset")} {label("|")} {red("illegal skip attempt")}");
+    }
+
+    private static bool IsTimerStopTrigger(string triggerName)
+    {
+        return IsNamedTrigger(triggerName, "st_stop", "surftimer_stop", "timer_stop");
+    }
+
+    private static bool IsTimerResetTrigger(string triggerName)
+    {
+        return IsNamedTrigger(triggerName, "st_reset", "surftimer_reset", "timer_reset");
+    }
+
+    private static bool IsNamedTrigger(string triggerName, params string[] names)
+    {
+        return !string.IsNullOrWhiteSpace(triggerName) &&
+               names.Any(name => triggerName.Equals(name, StringComparison.OrdinalIgnoreCase));
     }
 
     private static bool TryParseStageTrigger(string triggerName, out int stage)

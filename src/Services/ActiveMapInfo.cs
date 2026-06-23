@@ -6,6 +6,23 @@ public sealed class ActiveMapInfo
 {
     private const string DefaultStartTriggerName = "trigger_startzone";
     private const string DefaultEndTriggerName = "trigger_endzone";
+    private static readonly string[] BuiltInStartTriggerNames =
+    [
+        "map_start",
+        "s1_start",
+        "stage1_start",
+        "timer_startzone",
+        "zone_start",
+        DefaultStartTriggerName
+    ];
+
+    private static readonly string[] BuiltInEndTriggerNames =
+    [
+        "map_end",
+        "timer_endzone",
+        "zone_end",
+        DefaultEndTriggerName
+    ];
 
     private ActiveMapInfo(string mapName, string startTriggerName, string endTriggerName)
         : this(mapName, startTriggerName, endTriggerName, null, null, null, new Dictionary<int, ActiveBonusInfo>())
@@ -57,12 +74,12 @@ public sealed class ActiveMapInfo
 
     public bool IsStartTrigger(string triggerName)
     {
-        return string.Equals(triggerName, StartTriggerName, StringComparison.OrdinalIgnoreCase);
+        return MatchesTriggerName(triggerName, StartTriggerName, BuiltInStartTriggerNames);
     }
 
     public bool IsEndTrigger(string triggerName)
     {
-        return string.Equals(triggerName, EndTriggerName, StringComparison.OrdinalIgnoreCase);
+        return MatchesTriggerName(triggerName, EndTriggerName, BuiltInEndTriggerNames);
     }
 
     public bool IsInsideStartZone(Vector3Value position)
@@ -129,6 +146,22 @@ public sealed class ActiveMapInfo
         }
 
         return bonuses;
+    }
+
+    private static bool MatchesTriggerName(string triggerName, string configuredName, IEnumerable<string> builtInNames)
+    {
+        if (string.IsNullOrWhiteSpace(triggerName))
+        {
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(configuredName) &&
+            string.Equals(triggerName, configuredName, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return builtInNames.Any(name => string.Equals(triggerName, name, StringComparison.OrdinalIgnoreCase));
     }
 }
 

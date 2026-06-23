@@ -123,6 +123,7 @@ public sealed partial class SwiftlyBhopTimer : BasePlugin
     ];
     private static readonly string[] AdminPermissions = ["swiftlybhoptimer.admin"];
     private static readonly Regex StageTriggerPattern = new(@"^(?:s|stage)([1-9][0-9]?)_start$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly Regex CheckpointTriggerPattern = new(@"^map_(?:cp|checkpoint)([1-9][0-9]?)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     private static readonly Regex BonusStartTriggerPattern = new(@"^(?:(?:b|bonus)(?<bonus>[1-9][0-9]?)_start|timer_bonus(?<timerbonus>[1-9][0-9]?)_startzone)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     private static readonly Regex BonusEndTriggerPattern = new(@"^(?:(?:b|bonus)(?<bonus>[1-9][0-9]?)_end|timer_bonus(?<timerbonus>[1-9][0-9]?)_endzone)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
     private static readonly Regex StatusMapPattern = new(@"^\s*map\s*:\s*(?<map>\S+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);

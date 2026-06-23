@@ -185,6 +185,8 @@ recommended to install:
 - Either [SharpTimer/STFixes-metamod](https://github.com/SharpTimer/STFixes-metamod)
   or [Source2ZE/MovementUnlocker](https://github.com/Source2ZE/MovementUnlocker)
 - [Interesting-exe/CS2Fixes-RampbugFix](https://github.com/Interesting-exe/CS2Fixes-RampbugFix/)
+- [Source2ZE/CS2Fixes](https://github.com/Source2ZE/CS2Fixes) may be required
+  on some maps, depending on their entities, triggers, and server-side behavior.
 
 `STFixes-metamod` already contains surf/bhop-oriented movement fixes and a
 movement unlocker option, so avoid enabling duplicate movement unlock behavior
@@ -266,3 +268,4 @@ Rights and licenses remain with each respective project.
 - [SharpTimer/STFixes-metamod](https://github.com/SharpTimer/STFixes-metamod): surf/bhop movement-fix reference and recommended server plugin
 - [Source2ZE/MovementUnlocker](https://github.com/Source2ZE/MovementUnlocker): movement unlock reference and recommended server plugin
 - [Interesting-exe/CS2Fixes-RampbugFix](https://github.com/Interesting-exe/CS2Fixes-RampbugFix/): rampbug mitigation reference and recommended server plugin
+- [Source2ZE/CS2Fixes](https://github.com/Source2ZE/CS2Fixes): optional compatibility plugin that may be required on some maps
